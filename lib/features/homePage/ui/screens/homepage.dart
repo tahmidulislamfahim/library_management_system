@@ -22,6 +22,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _loadCategories();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus();
+    });
   }
 
   Future<void> _loadCategories() async {
@@ -89,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Search(),
+                child: const Search(key: ValueKey('searchBar')),
               ),
               const SizedBox(height: 20),
 

@@ -11,15 +11,21 @@ class Search extends StatefulWidget {
   _SearchState createState() => _SearchState();
 }
 
-class _SearchState extends State<Search> {
+class _SearchState extends State<Search> with AutomaticKeepAliveClientMixin {
   final BookService _bookService = BookService();
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
   List<Book> _searchResults = [];
   bool _isSearching = false;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void dispose() {
     _searchController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -62,10 +68,12 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Column(
       children: [
         TextField(
           controller: _searchController,
+          focusNode: _focusNode,
           decoration: InputDecoration(
             hintText: 'Search books...',
             prefixIcon: Icon(Icons.search, color: AppColors.themeColor),
@@ -92,17 +100,15 @@ class _SearchState extends State<Search> {
             }
           },
         ),
-
         if (_isSearching)
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Center(child: CircularProgressIndicator()),
           ),
-
         if (_searchResults.isNotEmpty)
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            constraints: BoxConstraints(maxHeight: 300),
+            constraints: const BoxConstraints(maxHeight: 300),
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: _searchResults.length,

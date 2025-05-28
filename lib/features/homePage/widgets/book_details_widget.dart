@@ -167,7 +167,18 @@ class BookDetails extends StatelessWidget {
             CustomButton(
               text: 'Borrow Book',
               onPressed: () async {
-                if (user == null || book.stock <= 0) return;
+                if (user == null || book.stock <= 0) {
+                  Navigator.pop(context);
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    showErrorDialog(
+                      parentContext,
+                      user == null
+                          ? 'You must be logged in to borrow books.'
+                          : 'This book is out of stock.',
+                    );
+                  });
+                  return;
+                }
 
                 try {
                   final existing = await supabase
@@ -177,7 +188,7 @@ class BookDetails extends StatelessWidget {
                       .eq('user_id', user.id);
 
                   if (existing.isNotEmpty) {
-                    Navigator.pop(context); // Close modal first
+                    Navigator.pop(context);
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       showErrorDialog(
                         parentContext,
@@ -199,7 +210,7 @@ class BookDetails extends StatelessWidget {
                       .update({'stock': book.stock - 1})
                       .eq('id', book.id);
 
-                  Navigator.pop(context); // Close modal
+                  Navigator.pop(context);
 
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     showSuccessDialog(
@@ -208,7 +219,7 @@ class BookDetails extends StatelessWidget {
                     );
                   });
                 } catch (e) {
-                  Navigator.pop(context); // Close modal
+                  Navigator.pop(context);
 
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     showErrorDialog(
